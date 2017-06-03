@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# txt
+*.txt
+
+# json
+*.json
+
+# pdf
+*.pdf
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Compiled binary addons (http://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directory
+node_modules
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# New Relic
+newrelic_agent.log
+
+# Mac
+.DS_Store
+
+# Custom
+
+# Vim temporary files
+.swp
