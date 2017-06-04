@@ -22,7 +22,6 @@ module.exports = (cb) => {
     oConfig.bAnalyze = true;
     oConfig.sAnalyzeFilePath = sAnalyzeFilePath;
   }
-  oConfig.fZnalyze = false;
 
   let sEncryptedFile = 'encrypted.txt';
   let sEncryptedFilePath = (path.join(__dirname), '../', sEncryptedFile);
@@ -31,7 +30,11 @@ module.exports = (cb) => {
     oConfig.bDecode = true;
     oConfig.sEncryptedFilePath = sEncryptedFilePath;
   }
-  oConfig.bDecode = true;
+
+  let sDecodedFile = 'decoded.txt';
+  let sDecodedFilePath = (path.join(__dirname), '../', sDecodedFile);
+  log(`sDecodedFile = ${sDecodedFile}`, oConfig);
+  oConfig.sDecodedFilePath = sDecodedFilePath;
 
   log('oConfig = ' + JSON.stringify(oConfig, null, 2), oConfig);
   cb(null, oConfig);

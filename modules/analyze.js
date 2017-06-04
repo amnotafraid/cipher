@@ -247,7 +247,20 @@ exports.plain = (oConfig, cb) => {
           oConfig.aoLetterFrequency = aoLetterFrequency;
           oConfig.aoPairFrequency = aoPairFrequency;
 
-          cb (null, oConfig);
+          let aoPlainSorted = oConfig.aoLetterFrequency.sort(
+            function(obj1, obj2) {
+              return obj1.frequency - obj2.frequency;
+            }
+          );
+
+          test.letterFrequency(aoPlainSorted, 
+            function (err, fMinDiff) {
+              if (err) {
+                cb (err, oConfig);
+              }
+
+              cb (null, oConfig);
+            });
         });
     });
   }
@@ -317,8 +330,7 @@ exports.encrypted = (oConfig, cb) => {
     cb(err, null, null, oConfig);
   })
   .on('finish', function () {
-    console.log('finish');
-    cb(null, null, null, oConfig);
+    console.log('\nfinish');
     calculateFrequency(oConfig, 
       function(err, aoLetterFrequency, aoPairFrequency) {
         console.log('callback calculatedFrequency');
