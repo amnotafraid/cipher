@@ -1,6 +1,7 @@
 'use strict'
 const fs          = require('fs');
 const path        = require('path');
+const now         = require('performance-now');
 
 const log         = require('./log');
 
@@ -11,6 +12,7 @@ module.exports = (cb) => {
     bDecode: false,
     sInputFile: '../input.json',
     sOutputFile: '../output.json',
+    tStart: now(),
   };
 
   log('initialize', oConfig);

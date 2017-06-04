@@ -1,11 +1,20 @@
 'use strict'
 const fs          = require('fs');
+const through2    = require('through2');
 
 const analyze     = require('./analyze');
 const c           = require('./constants');
 const log         = require('./log');
 const terminate   = require('./terminate');
 const test        = require('./test');
+
+/*
+ * string replace I copied from a bathroom wall
+ */
+String.prototype.replaceAll = function(str1, str2, ignore) 
+  {
+      return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+  }
 
 
 /*
@@ -63,6 +72,9 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
     }
   );
 
+  log('plainSorted = ' + JSON.stringify(aoPlainSorted, null, 2), oConfig);
+  log('encryptedSorted = ' + JSON.stringify(aoEncryptedSorted, null, 2), oConfig);
+
   if (aoPlainSorted.length !== 26 || 
       aoEncryptedSorted.length !== 26) {
     cb('The two letter frequency arrays lengths is wrong.  They should both be 26', null, null, oConfig);
@@ -78,6 +90,8 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
 
     for (let i = 0; i < aoEncryptedSorted.length; i++) {
       oCode[aoEncryptedSorted[i].letter] = aoPlainSorted[i].letter;
+      oCode[aoEncryptedSorted[i].letter.toUpperCase()] = 
+        aoPlainSorted[i].letter.toUpperCase();
     }
 
     let sCipher = '';
@@ -119,13 +133,13 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
 
 module.exports = function(oConfig, cb) {
   log('decode', oConfig);
-
   if (oConfig.bDecode) {
     // get encrypted file's letter and pair frequencies
     analyze.encrypted(oConfig,
       function (err, aoLetterFrequency, aoPairFrequency, oConfig) {
         log('return from analyze.encrypted', oConfig);
-        
+        console.log('aoPairFrequency = ' + JSON.stringify(aoPairFrequency, null, 2));
+        // use letter frequencies to make a cipher
         getLetterCipherKey(aoLetterFrequency, oConfig,
           function (err, oCode, sCipher, oConfig) {
             if (err) {
@@ -136,9 +150,37 @@ module.exports = function(oConfig, cb) {
             log('oCode = ' + JSON.stringify(oCode, null, 2), oConfig);
             log(`sCipher = ${sCipher}`, oConfig);
 
-            cb (null, oConfig);
-          });
+            let outputFile = fs.createWriteStream(oConfig.sDecodedFilePath);
+            fs.createReadStream(oConfig.sEncryptedFilePath, {
+              encoding: 'utf8'
+            })
+            .on('error', function(err) {
+              cb(err, oConfig)
+            })
+            .pipe(through2((data, enc, cb) => {
+              let str = data.toString();
+
+              for (let key of Object.keys(oCode)) {
+                str = str.replaceAll(key, oCode[key]);
+              }
+              
+              cb(null, new Buffer(str));
+              })
+            )
+            .on('error', function(err) {
+              cb(err, oConfig)
+            })
+            .pipe(outputFile)
+            .on('error', function(err) {
+              cb(err, oConfig);
+            })
+            .on('finish', function () {
+              console.log('\nfinish');
+              cb (null, oConfig);
+            });
+          }); //getLetterCipherKey
       });
   }
-}
 
+  cb(null, oConfig);
+}
