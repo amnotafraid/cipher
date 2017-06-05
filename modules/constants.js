@@ -5,3 +5,4 @@ const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 exports.abc = abc;
 exports.ABC = ABC;
+exports.alphabetLength = 26;
