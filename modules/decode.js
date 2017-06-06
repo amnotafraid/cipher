@@ -15,11 +15,10 @@ const test        = require('./test');
 String.prototype.replaceAll = function(str1, str2, ignore) {
       return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
 }
-Array.prototype.swapItems = function(a, b){
-    this[a] = this.splice(b, 1, this[a])[0];
-    return this;
-}
 
+/*
+ * swapArrayElements I copied from another bathroom wall
+ */
 var swapArrayElements = function (a, x, y) {
   if (a.length === 1) return a;
   a.splice(y, 1, a.splice(x, 1, a[y])[0]);
@@ -45,9 +44,70 @@ var aoEPF = []; /* aoEncryptedPairFrequency */
  * They have to be declared ABOVE the aScoringFunctions
  * declaration.
  */
+var aNeverPairs = [];
+var neverPairs = function (oCode) {
+  let iScore = 0;
+  aNeverPairs.forEach(function(pair) {
+    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
+    let index = getEFPIndex(pairEncrypted);
+    if (aoEPF[index].frequency === 0) {
+      iScore++;
+    }
+  });
+
+  console.log(`neverPairs = ${iScore}`);
+  return iScore;
+}
+
+var aVeryCommonPairs = [];
+var veryCommonPairs = function (oCode) {
+  let iScore = 0;
+  aVeryCommonPairs.forEach(function(pair) {
+    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
+    let index = getEFPIndex(pairEncrypted);
+    if (aoEPF[index].frequency > 0.02) {
+      iScore+=4;
+    }
+  });
+
+  console.log(`veryCommonPairs = ${iScore}`);
+  return iScore;
+}
+
+var aCommonPairs = [];
+var commonPairs = function (oCode) {
+  let iScore = 0;
+  aCommonPairs.forEach(function(pair) {
+    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
+    let index = getEFPIndex(pairEncrypted);
+    if (aoEPF[index].frequency > 0.01 && 
+        aoEPF[index].frequency < 0.02) {
+      iScore+=3;
+    }
+  });
+
+  console.log(`commonPairs = ${iScore}`);
+  return iScore;
+}
+
+var aLikelyPairs = [];
+var likelyPairs = function (oCode) {
+  let iScore = 0;
+  aLikelyPairs.forEach(function(pair) {
+    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
+    let index = getEFPIndex(pairEncrypted);
+    if (aoEPF[index].frequency > 0.005 && 
+        aoEPF[index].frequency < 0.01) {
+      iScore+=2;
+    }
+  });
+
+  console.log(`veryLikelyPairs = ${iScore}`);
+  return iScore;
+}
+
 var rarePairs = function (oCode) {
   let iScore = 0;
-  /*
   [ 'aa','bp','cj','cp','dx','fj','gz','ij','jm','mk','rx','uq','vc','ww','yy' ].forEach(function(pair) {
     let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
     let index = getEFPIndex(pairEncrypted);
@@ -55,23 +115,8 @@ var rarePairs = function (oCode) {
       iScore++;
     }
   });
- */
 
-  console.log(`rarePairs ${iScore}`);
-  return iScore;
-}
-
-var commonPairs = function (oCode) {
-  let iScore = 0;
-  [ 'ss', 'ee', 'tt'].forEach(function(pair) {
-    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
-    let index = getEFPIndex(pairEncrypted);
-    if (aoEPF[index].frequency > 0.001) {
-      iScore++;
-    }
-  });
-
-  console.log(`commonPairs ${iScore}`);
+  console.log(`rarePairs = ${iScore}`);
   return iScore;
 }
 
@@ -80,17 +125,16 @@ var ae = function (oCode) {
   let pAA = getEncryptedPair(oCode, 'a', 'a');
   let i = getEFPIndex(pAA);
   if (aoEPF[i].frequency < 0.0001) {
-    iScore++;
+    let pEA = getEncryptedPair(oCode, 'e', 'a');
+    let iEA = getEFPIndex(pEA);
+    let pAE = getEncryptedPair(oCode, 'a', 'e');
+    let iAE = getEFPIndex(pAE);
+    if ((aoEPF[iAE] * 10) < aoEPF[iEA]) {
+      iScore+=7;
+    }
   }
-  let pEA = getEncryptedPair(oCode, 'e', 'a');
-  let iEA = getEFPIndex(pEA);
-  let pAE = getEncryptedPair(oCode, 'a', 'e');
-  let iAE = getEFPIndex(pAE);
-  if ((aoEPF[iAE] * 10) < aoEPF[iEA]) {
-    iScore++;
-  }
-  
-  console.log(`ae ${iScore}`);
+
+  console.log(`commonPairs = ${iScore}`);
   return iScore;
 }
 
@@ -98,15 +142,32 @@ var th = function(oCode) {
   let iScore = 0;
   let pTH = getEncryptedPair(oCode, 't', 'h');
   let iTH = getEFPIndex(pTH);
-  if (aoEPF[iTH].frequency > 0.01) {
-    iScore++;
+  if (aoEPF[iTH].frequency > 0.02) {
+    iScore+=5;
   }
 
-  console.log(`th ${iScore}`);
+  console.log(`th = ${iScore}`);
   return iScore;
 }
 
-var aScoringFunctions = [rarePairs,ae,th,commonPairs];
+var q = function(oCode) {
+  let iScore = 0;
+  let bIsQ = true;
+  'abcdefghijklmnopqrstuvwxyz'.split('').forEach(function(p2) {
+    let pqX = getEncryptedPair(oCode, 'q', p2);
+    let iqX = getEFPIndex(pqX);
+    if (aoEPF[iqX].frequency !== 0) {
+      bIsQ = false;
+    }
+  });
+
+  if (bIsQ) {
+    iScore = 3;
+  }
+
+  console.log(`q = ${iScore}`);
+  return iScore;
+}
 
 function getKeyFromValue(oCode, value) {
   return Object.keys(oCode).find(key => oCode[key] === value);
@@ -125,13 +186,85 @@ function getEFPIndex(pair) {
   return (j * 26) + i;
 }
 
+var aScoringFunctions = [neverPairs,veryCommonPairs,commonPairs,likelyPairs,rarePairs,ae,th,q];
+
+/*
+ * makePairProbability
+ *
+ * Given oConfig.aoPairFrequency, which is the frequency
+ * of pairs in a plain text object, get these arrays:
+ *
+ * aNeverPairs - these pairs never occur
+ * aVeryCommonPairs - pair frequency > .02
+ * aCommonPairs - pair frequency > .01
+ * aLikelyPairs - pair frequency > .005
+ *
+ * Yes, this is bad form, but it was close to midnight
+ * It should be all in one nice recursive function that makes
+ * an array of arrays and then the scoring functions should
+ * be parameterized...
+ *
+ * Sorry.  I have to go to work tomorrow.  You know?  The
+ * job that pays me?
+ *
+ * As fun as coding challenges are, they don't pay the bills.
+ */
+function makePairProbability(oConfig) {
+  let aoPPF = oConfig.aoPairFrequency;
+  let aoPPFReduce = R.clone(aoPPF);
+
+  for (let i = 0; i < aoPPF.length; i++) {
+    console.log(`aoPPF[${i}] = ` + JSON.stringify(aoPPF[i], null, 2));
+    if (aoPPF[i].frequency === 0) {
+      console.log('found a never');
+      aNeverPairs.push(aoPPF[i].pair);
+      aoPPFReduce.splice(i, 1);
+    }
+  }
+
+  let aoPPFReduce1 = R.clone(aoPPFReduce);
+  for (let i = 0; i < aoPPFReduce.length; i++) {
+    if (aoPPF[i].frequency > 0.02) {
+      aVeryCommonPairs.push(aoPPFReduce[i].pair);
+      aoPPFReduce1.splice(i, 1);
+    }
+  }
+
+  let aoPPFReduce2 = R.clone(aoPPFReduce1);
+  for (let i = 0; i < aoPPFReduce1.length; i++) {
+    if (aoPPF[i].frequency > 0.01) {
+      aCommonPairs.push(aoPPFReduce1[i].pair);
+      aoPPFReduce2.splice(i, 1);
+    }
+  }
+
+  let aoPPFReduce3 = R.clone(aoPPFReduce2);
+  for (let i = 0; i < aoPPFReduce2.length; i++) {
+    if (aoPPF[i].frequency > 0.01) {
+      aLikelyPairs.push(aoPPFReduce2[i].pair);
+      aoPPFReduce3.splice(i, 1);
+    }
+  }
+}
+
 function score(oCode) {
   var iTotalScore = 0;
   for (let i = 0; i < aScoringFunctions.length; i++) {
-    iTotalScore = aScoringFunctions[i](oCode);
+    iTotalScore += aScoringFunctions[i](oCode);
   }
 
+  console.log('iTotalScore = ' + iTotalScore);
   return iTotalScore;
+}
+
+function getCipher(oCode) {
+  let sCipher = '';
+  for (let i = 0; i < c.abc.length; i++) {
+    let letter = c.abc[i];
+    sCipher += oCode[letter];
+  }
+
+  return sCipher;
 }
 
 function getCode(aoEncrypted, aoPlain) {
@@ -191,7 +324,10 @@ function getCodeWithBestScore() {
   );
 
 	var oCode = aoReallySorted[0].oCode;
-  console.log('oCode = ' + JSON.stringify(oCode));
+  let sCipher = getCipher(oCode);
+  console.log('sCipher = ' + sCipher);
+  console.log('score = ' + aoReallySorted[0].iScore);
+  console.log('# of arrays = ' + aoReallySorted.length);
   // fancy way to empty array
   aoSorted.splice(0,aoSorted.length);
   return oCode;
@@ -200,13 +336,18 @@ function getCodeWithBestScore() {
 function permuteAndScore(aoSorted) {
   let lenSection = 4;
   let last = c.alphabetLength - lenSection;
-	var oCode = {};
+  let oCode = {};
 
-  for (let i = 0; i < last; i+=2) {
+  for (let i = 0; i < last; i++) {
+    console.log(`permuteAndScoreSection(${i}, ${i + lenSection})`);
     permuteAndScoreSection (aoSorted, i, i + lenSection)
     oCode = getCodeWithBestScore();
   }
 
+  console.log('aNeverPairs = ' + JSON.stringify(aNeverPairs, null, 2));
+  console.log('aVeryCommonPairs = ' + JSON.stringify(aVeryCommonPairs, null, 2));
+  console.log('aCommonPairs = ' + JSON.stringify(aCommonPairs, null, 2));
+  console.log('aLikelyPairs = ' + JSON.stringify(aLikelyPairs, null, 2));
   return oCode;
 }
 
@@ -276,8 +417,8 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
     }
   );
 
-  log('plainSorted = ' + JSON.stringify(aoPlainSorted, null, 2), oConfig);
-  log('encryptedSorted = ' + JSON.stringify(aoEncryptedSorted, null, 2), oConfig);
+//  log('plainSorted = ' + JSON.stringify(aoPlainSorted, null, 2), oConfig);
+//  log('encryptedSorted = ' + JSON.stringify(aoEncryptedSorted, null, 2), oConfig);
 
   if (aoPlainSorted.length !== 26 || 
       aoEncryptedSorted.length !== 26) {
@@ -290,16 +431,13 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
     }
     log(`fMinDiff for ${oConfig.sEncryptedFilePath} is ${fMinDiff}.  This is the minimum difference between the frequencies`, oConfig);
 
+    makePairProbability(oConfig);
+
     var oCode = permuteAndScore(aoEncryptedSorted); 
 
     oCode = addCodeUpperCase(oCode);
 
-    let sCipher = '';
-
-    for (let i = 0; i < c.abc.length; i++) {
-      let letter = c.abc[i];
-      sCipher += oCode[letter];
-    }
+    let sCipher = getCipher(oCode);
 
     cb (null, oCode, sCipher, oConfig);
   });
@@ -333,7 +471,7 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
 
 module.exports = function(oConfig, cb) {
   log('decode', oConfig);
-//  console.log('oConfig.aoPairFrequency = ' + JSON.stringify(oConfig.aoPairFrequency, null, 2));
+  console.log('oConfig.aoPairFrequency = ' + JSON.stringify(oConfig.aoPairFrequency, null, 2));
   if (oConfig.bDecode) {
     // get encrypted file's letter and pair frequencies
     analyze.encrypted(oConfig,
