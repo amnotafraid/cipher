@@ -141,16 +141,26 @@ var countLetters = through2((data, enc, cb) => {
  *      ...
  *    ]
  *
+ * oPairFrequency is like this:
+ * {
+ *   aa: frequency,
+ *   ab: frequency,
+ *   ...
+ *   zy: frequency,
+ *   zz: frequency
+ * }
+ *
  * Later on, you can do an array sort on the fequency
  *
  * The callback looks like this:
  *
- *  cb(null, aoLetterFrequency, aoPairFrequency)
+ *  cb(null, aoLetterFrequency, oPairFrequency, aoSortablePairFrequency)
  */
 var calculateFrequency = (oConfig, cb) => {
   log('\ncalculateFrequency', oConfig);
   var aoLetterFrequency = [];
   var aoPairFrequency = [];
+  var oAllPairFrequency = {};
 
   if (oLetterCounter.iTotalCount > 26) {
     for (let i = 0; i < c.abc.length; i++) {
@@ -167,11 +177,12 @@ var calculateFrequency = (oConfig, cb) => {
         oPairFrequency.frequency = oPairCounter.oPairCounts[pair] /
                                     oPairCounter.iTotalCount;
 
+        oAllPairFrequency[pair] = oPairFrequency.frequency;
         aoPairFrequency.push(oPairFrequency);
       }
     }
 
-    cb(null, aoLetterFrequency, aoPairFrequency);
+    cb(null, aoLetterFrequency, oAllPairFrequency, aoPairFrequency);
   }
   else {
     cb(`There are only ${oLetterCounter.iTotalCount} letters to analyze.  It's not enough to figure it out.  Sorry. :-(`, null, null);
@@ -239,13 +250,13 @@ exports.plain = (oConfig, cb) => {
     })
     .on('finish', function () {
       calculateFrequency(oConfig, 
-        function(err, aoLetterFrequency, aoPairFrequency) {
+        function(err, aoLetterFrequency, oPairFrequency, aoPairFrequency) {
           if (err) {
             cb(err, oConfig);
           }
 
           oConfig.aoLetterFrequency = aoLetterFrequency;
-          oConfig.aoPairFrequency = aoPairFrequency;
+          oConfig.aoSortablePairFrequency = aoPairFrequency;
 
           let aoPlainSorted = oConfig.aoLetterFrequency.sort(
             function(obj1, obj2) {
@@ -332,7 +343,7 @@ exports.encrypted = (oConfig, cb) => {
   .on('finish', function () {
     console.log('\nfinish');
     calculateFrequency(oConfig, 
-      function(err, aoLetterFrequency, aoPairFrequency) {
+      function(err, aoLetterFrequency, oPairFrequency, aoPairFrequency) {
         console.log('callback calculatedFrequency');
         if (err) {
           console.log('err = ' + err);
@@ -340,7 +351,7 @@ exports.encrypted = (oConfig, cb) => {
         }
 
         console.log('non error callback to decode');
-        cb (null, aoLetterFrequency, aoPairFrequency, oConfig);
+        cb (null, aoLetterFrequency, oPairFrequency, aoPairFrequency, oConfig);
       });
   });
 }
