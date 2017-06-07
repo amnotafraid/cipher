@@ -1,3 +1,19 @@
+/*
+ * You have to fix aSorted.  You need an array to keep track of the
+ * scores with the oCode and the aoEncryptedSorted that works the best
+ *
+ * Sometimes aSorted refers to the Encrypted letters used to make oCode.
+ * Sometimes aSorted refers to the array of score keeping
+ *
+ * You fixed the above.  Take a look at aoEncryptedSorted.  I don't think
+ * it should be an global.  I think it needs to be a local since it
+ * will change so much.
+ *
+ * Maybe every time you use it, you need to print it out.
+ *
+ * After you permute and score a section, you are not using the
+ * array that it made in the next stage.
+ */
 'use strict'
 const fs          = require('fs');
 const through2    = require('through2');
@@ -8,6 +24,17 @@ const c           = require('./constants');
 const log         = require('./log');
 const terminate   = require('./terminate');
 const test        = require('./test');
+
+/*
+ * aoScores has objects like this:
+ * {
+ *    iScore: 9,
+ *    aoES: array
+ * }
+ */
+var aoScores = [];
+var aoPlainSorted = [];
+var aoEPF = []; /* aoEncryptedPairFrequency */
 
 /*
  * string replace I copied from a bathroom wall
@@ -24,18 +51,6 @@ var swapArrayElements = function (a, x, y) {
   a.splice(y, 1, a.splice(x, 1, a[y])[0]);
   return a;
 };
-
-/*
- * aoSorted has objects like this:
- * {
- *    oCode: {},
- *    iScore: 9
- * }
- */
-var aoSorted = [];
-var aoPlainSorted = [];
-var aoEncryptedSorted = [];
-var aoEPF = []; /* aoEncryptedPairFrequency */
 
 /*
  * Scoring function have oCode as a parameter
@@ -55,7 +70,7 @@ var neverPairs = function (oCode) {
     }
   });
 
-  console.log(`neverPairs = ${iScore}`);
+//  console.log(`neverPairs = ${iScore}`);
   return iScore;
 }
 
@@ -70,7 +85,7 @@ var veryCommonPairs = function (oCode) {
     }
   });
 
-  console.log(`veryCommonPairs = ${iScore}`);
+//  console.log(`veryCommonPairs = ${iScore}`);
   return iScore;
 }
 
@@ -86,7 +101,7 @@ var commonPairs = function (oCode) {
     }
   });
 
-  console.log(`commonPairs = ${iScore}`);
+//  console.log(`commonPairs = ${iScore}`);
   return iScore;
 }
 
@@ -102,7 +117,7 @@ var likelyPairs = function (oCode) {
     }
   });
 
-  console.log(`veryLikelyPairs = ${iScore}`);
+//  console.log(`veryLikelyPairs = ${iScore}`);
   return iScore;
 }
 
@@ -116,7 +131,7 @@ var rarePairs = function (oCode) {
     }
   });
 
-  console.log(`rarePairs = ${iScore}`);
+//  console.log(`rarePairs = ${iScore}`);
   return iScore;
 }
 
@@ -134,7 +149,7 @@ var ae = function (oCode) {
     }
   }
 
-  console.log(`commonPairs = ${iScore}`);
+//  console.log(`commonPairs = ${iScore}`);
   return iScore;
 }
 
@@ -146,7 +161,7 @@ var th = function(oCode) {
     iScore+=5;
   }
 
-  console.log(`th = ${iScore}`);
+//  console.log(`th = ${iScore}`);
   return iScore;
 }
 
@@ -165,7 +180,7 @@ var q = function(oCode) {
     iScore = 3;
   }
 
-  console.log(`q = ${iScore}`);
+//  console.log(`q = ${iScore}`);
   return iScore;
 }
 
@@ -214,9 +229,9 @@ function makePairProbability(oConfig) {
   let aoPPFReduce = R.clone(aoPPF);
 
   for (let i = 0; i < aoPPF.length; i++) {
-    console.log(`aoPPF[${i}] = ` + JSON.stringify(aoPPF[i], null, 2));
+//    console.log(`aoPPF[${i}] = ` + JSON.stringify(aoPPF[i], null, 2));
     if (aoPPF[i].frequency === 0) {
-      console.log('found a never');
+//      console.log('found a never');
       aNeverPairs.push(aoPPF[i].pair);
       aoPPFReduce.splice(i, 1);
     }
@@ -253,7 +268,7 @@ function score(oCode) {
     iTotalScore += aScoringFunctions[i](oCode);
   }
 
-  console.log('iTotalScore = ' + iTotalScore);
+//  console.log('iTotalScore = ' + iTotalScore);
   return iTotalScore;
 }
 
@@ -268,6 +283,7 @@ function getCipher(oCode) {
 }
 
 function getCode(aoEncrypted, aoPlain) {
+  console.log('aoEncrypted[0] = ' + JSON.stringify(aoEncrypted[0], null, 2));
   let oCode = {};
   for (let i = 0; i < c.alphabetLength; i++) {
     oCode[aoEncrypted[i].letter] = aoPlain[i].letter;
@@ -294,61 +310,95 @@ function addCodeUpperCase(oCode) {
 function scoreAndSave(a) {
 //	console.log('a = ' + JSON.stringify(a, null, 2));
   var obj = {};
-  obj.oCode = getCode(a, aoPlainSorted);
-  obj.iScore = score(obj.oCode);
+  let oCode = getCode(a, aoPlainSorted);
+  obj.iScore = score(oCode);
+  obj.aoES = a;
 
+  let sCipher = getCipher(oCode);
+  let s = getString(a);
+//  console.log(`string ${s} score = ${obj.iScore}`);
 //  console.log('iScore = ' + obj.iScore);
-  aoSorted.push(obj);
-//  console.log('# of arrays = ' + aoSorted.length);
+  aoScores.push(obj);
+//  console.log('# of arrays = ' + aoScores.length);
+}
+
+function getString(a) {
+  let str = '';
+  for (let i = 0; i < a.length; i++) {
+    str += a[i].letter;
+  }
+  return str;
 }
 
 function permuteAndScoreSection(a, beg, end) {
+  let s = getString(a);
+//  console.log(`beg = ${beg}; end = ${end}; string = ${s}`);
   scoreAndSave(a);
   if (beg === end) {
     return;
   }
   else {
     for (let j = beg; j <= end; j++) {
-      let aSwap = swapArrayElements (a, beg, j);
-      permuteAndScoreSection(aSwap, beg + 1, end);
-      a = swapArrayElements (aSwap, beg, j); 
+      permuteAndScoreSection(
+        swapArrayElements (a, beg, j), beg + 1, end);
+//      let aSwap = swapArrayElements (a, beg, j);
+//      permuteAndScoreSection(aSwap, beg + 1, end);
+//      a = swapArrayElements (aSwap, beg, j); 
     }
   }
 }
 
-function getCodeWithBestScore() {
-  let aoReallySorted = aoSorted.sort(
+function getArrayWithBestScore() {
+  let aoScoresSorted = aoScores.sort(
     function(obj1, obj2) {
       return obj2.iScore - obj1.iScore;
     }
   );
+  console.log(JSON.stringify(aoScoresSorted[0], null, 2));
 
-	var oCode = aoReallySorted[0].oCode;
-  let sCipher = getCipher(oCode);
-  console.log('sCipher = ' + sCipher);
-  console.log('score = ' + aoReallySorted[0].iScore);
-  console.log('# of arrays = ' + aoReallySorted.length);
+//	let oCode = aoScoresSorted[0].oCode;
+//  let sCipher = getCipher(oCode);
+  return aoScoresSorted[0].aoES;
+  /*
+  var aoES = R.clone(aoScoresSorted[0].aoES);
+//  console.log('sCipher = ' + sCipher);
+  console.log('score = ' + aoScoresSorted[0].iScore);
+//  console.log('# of arrays = ' + aoReallySorted.length);
   // fancy way to empty array
-  aoSorted.splice(0,aoSorted.length);
-  return oCode;
+  aoScores.splice(0,aoScores.length);
+  return aoES;
+ */
 }
 
-function permuteAndScore(aoSorted) {
+/*
+ * aoES means aoEncryptedSorted
+ */
+function permuteAndScore(aoES) {
+  console.log('permuteAndScore');
+  let s = getString(aoES);
+  console.log(`beginning array: ${s}`);
   let lenSection = 4;
   let last = c.alphabetLength - lenSection;
-  let oCode = {};
 
   for (let i = 0; i < last; i++) {
     console.log(`permuteAndScoreSection(${i}, ${i + lenSection})`);
-    permuteAndScoreSection (aoSorted, i, i + lenSection)
-    oCode = getCodeWithBestScore();
+    permuteAndScoreSection (aoES, i, i + lenSection)
+    // BESSIE - this should not get a code.  It should get an array
+    aoES = getArrayWithBestScore();
+    console.log('IMPORTANT aoES typeof = ' + typeof aoES);
+    s = getString(aoES);
+    console.log(`section ${i} array: ${s}`);
   }
 
-  console.log('aNeverPairs = ' + JSON.stringify(aNeverPairs, null, 2));
+  console.log('before get final oCode');
+  console.log('aoES = ' + JSON.stringify(aoES, null, 2));
+  let oCode = getCode(aoES, aoPlainSorted);
+  return addCodeUpperCase(oCode);
+/*  console.log('aNeverPairs = ' + JSON.stringify(aNeverPairs, null, 2));
   console.log('aVeryCommonPairs = ' + JSON.stringify(aVeryCommonPairs, null, 2));
   console.log('aCommonPairs = ' + JSON.stringify(aCommonPairs, null, 2));
   console.log('aLikelyPairs = ' + JSON.stringify(aLikelyPairs, null, 2));
-  return oCode;
+ */
 }
 
 
@@ -401,9 +451,15 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
    */
 
   /*
-   * aoPlainSorted, aoEncryptedSorted are global variables
+   * aoPlainSorted is a global variable.  It will never
+   * change.  It is the letters sorted by frequency.
    *
-   * (yes, brilliant - seemingly totally arbritrary)
+   * Meanwhile, aoEncryptedSorted is a local variable.
+   * Arrays are immutable, which means that if you want
+   * to sort it, you have to make a new one.  Many new
+   * ones will be made as the letters are permuted and
+   * the sort is scored to find the best one.
+   *
    */
   aoPlainSorted = oConfig.aoLetterFrequency.sort(
     function(obj1, obj2) {
@@ -411,6 +467,7 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
     }
   );
 
+  let aoEncryptedSorted = [];
   aoEncryptedSorted = aoLetterFrequency.sort(
     function(obj1, obj2) {
       return obj2.frequency - obj1.frequency;
@@ -431,13 +488,16 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
     }
     log(`fMinDiff for ${oConfig.sEncryptedFilePath} is ${fMinDiff}.  This is the minimum difference between the frequencies`, oConfig);
 
+    /* analyze the plain pairs to find which pairs
+     * are common
+     */
     makePairProbability(oConfig);
 
-    var oCode = permuteAndScore(aoEncryptedSorted); 
-
-    oCode = addCodeUpperCase(oCode);
+    let oCode = permuteAndScore(aoEncryptedSorted); 
 
     let sCipher = getCipher(oCode);
+
+    oCode = addCodeUpperCase(oCode);
 
     cb (null, oCode, sCipher, oConfig);
   });
@@ -471,7 +531,7 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
 
 module.exports = function(oConfig, cb) {
   log('decode', oConfig);
-  console.log('oConfig.aoPairFrequency = ' + JSON.stringify(oConfig.aoPairFrequency, null, 2));
+//  console.log('oConfig.aoPairFrequency = ' + JSON.stringify(oConfig.aoPairFrequency, null, 2));
   if (oConfig.bDecode) {
     // get encrypted file's letter and pair frequencies
     analyze.encrypted(oConfig,
