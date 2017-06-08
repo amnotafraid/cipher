@@ -127,8 +127,8 @@ There is a file modules/initialization that has some 'flags' and variables that 
 *NOTE*:  I designed it to be run as a command-line program.  To me, the challenge was being able to figure out how to get the correct key.  The endpoints are called in succession by the main file `cipher.js`.
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
-* Grow up and `Promise`-ize this code.  I was forced to use it in decode when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  `Promises` should be used consistently for more reliability--prevent the race conditions, rather than fixing them after they happen.
-* Tighten up what version of JavaScript standard is adhered to.  I started out with good intentions to us ES2015, but as I got more involved, I fell into old habits.
+* Grow up and `Promise`-ize this code.  I was forced to use it in `modules/decode` when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  `Promises` should be used consistently for more reliability--prevent the race conditions, rather than fixing them after they happen.
+* Tighten up what version of JavaScript standard is adhered to.  I started out with good intentions to use ES2015, but as I got more involved, I fell into old habits.
 * Try it on a different language.  Will it work?  I think it will.  *Oh, hey* a *language* option could be added to choose a specific language.  There could be different scoring functions for different languages.
 * Move the stuff from `modules/decode.js` about finding the cipher key to `modules/findKey.js`. That way it can be more modularized. 
 * *TDD* It's kind of like closing the barn door after the horse got out, but this project really could have benefited from some test driven development.  I spent a whole bunch of time chasing really stupid and obvious bugs.  C'est la vie.  Live and learn.
