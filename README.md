@@ -118,10 +118,11 @@ There is a file modules/initialization that has some 'flags' and variables that 
 | bDecode | Set this to false if you want to skip the decoding phase.  Why would you do that?  That's no fun. |
 | bInDepthDecode | Set this to true if you want to do the permutations and scoring to get a better cipher code |
 | bOutputConsole | Set this to true if you want to output the decoded text to the console rather than to a file |
-| sAnalyzeFile | This is the file to analyze.  The default is 'plain.txt' |
-| sEncryptedFile | This is the file to decrypt. The default is 'encrypted.txt' |
-| sDecodedFile | This is the file to output the decrypted text to.  The default is  'decoded.txt' |
+| sAnalyzeFile | This is the file to analyze.  The default is `plain.txt` |
+| sEncryptedFile | This is the file to decrypt. The default is `encrypted.txt` |
+| sDecodedFile | This is the file to output the decrypted text to.  The default is  `decoded.txt` |
 
+<a id="areas-for-improvement"></a>
 ## Areas for Improvement [top](#top)
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
