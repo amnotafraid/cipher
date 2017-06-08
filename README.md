@@ -32,7 +32,7 @@ npm run watch
 Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
 
 <a id="executing"></a>
-## Executing [top](#top)
+## How to run [top](#top)
 
 To run the program, first get the code and build it as described above.  Next, get your files (encrypted.txt and plain.txt) and put them in the directory with the code.  Then, run the program:
 
