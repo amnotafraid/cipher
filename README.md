@@ -132,7 +132,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 * Move the stuff from `modules/decode.js` about finding the cipher key to `modules/findKey.js`. That way it can be more modularized. 
 * *TDD* It's kind of like closing the barn door after the horse got out, but this project really could have benefited from some test driven development.  I spent a whole bunch of time chasing really stupid and obvious bugs.  C'est la vie.  Live and learn.
 
-<id="making-a-frontend"></a>
+<a id="making-a-frontend"></a>
 ## Making a Front End [top](#top)
 I'm currently working in eCommerce.  When you buy products online, there is sort of a multi-step process, right?  You add items to a 'cart', you fill in your shipping information, you choose a shipment option (regular mail, 2nd-day, crazy expensive overnight...), you include payment information.  Behind the scenes there is an object that gets completed with more and more infomation:  products, shipping address, customer information, shipping option, and finally payment.
 
