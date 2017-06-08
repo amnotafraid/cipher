@@ -67,7 +67,7 @@ The `encrypted.txt` is also analyzed to find its character and pair frequencies.
 
 Here is a table of the letter frequencies in the English language:
 
-| Letter | Frequency |
+| Letter | Frequency 
 | E | 12.7 |
 | T | 9.1 |
 | A | 8.2 |
@@ -110,7 +110,7 @@ Once the cipher key is found, it's just a matter of substituting letter for lett
 ## Options [top](#top)
 There is a file modules/initialization that has some 'flags' and variables that can be modified to change the functioning of the program.  Here's what they do:
 
-| Variable/Flag | Description |
+| Variable/Flag | Description 
 | bLogConsole | If it's true, output status messages to the console.  This doesn't work right because the programmer (that's me) didn't use the log function consistently. |
 | bAnalyze | If analysis has already been done and the data is available, the analysis phase can be skipped.  The point is a bit moot because I never made a way to save the output of the aanalysis |
 | bDecode | Set this to false if you want to skip the decoding phase.  Why would you do that?  That's no fun. |
