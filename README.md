@@ -126,7 +126,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 ## Areas for Improvement [top](#top)
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
-* Grow up and `Promise`-ize this code.  I was forced to use it in decode when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  But, it should be used consistently.
+* Grow up and `Promise`-ize this code.  I was forced to use it in decode when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  `Promises` should be used consistently for more reliability--prevent the race conditions, rather than fixing them after they happen.
 * Tighten up what version of JavaScript standard is adhered to.  I started out with good intentions to us ES2015, but as I got more involved, I fell into old habits.
 * Try it on a different language.  Will it work?  I think it will.  *Oh, hey* a *language* option could be added to choose a specific language.  There could be different scoring functions for different languages.
 * Move the stuff from `modules/decode.js` about finding the cipher key to `modules/findKey.js`. That way it can be more modularized. 
