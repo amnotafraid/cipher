@@ -51,7 +51,7 @@ Nodemon will watch for any changes in the \*.js files and start the program over
 
 <a id="top-1"></a>
 ## How does this work? [top](#top)
-This is a Geek-worthy solution that optionally uses recursion and will analyze the file to correctness. Using the following steps:
+This is a Geek-worthy solution that optionally uses recursion and will analyze the file to correctness. It uses the following steps:
 
 * Analyze (#Analyze)
 * Find Key (#Find Key)
