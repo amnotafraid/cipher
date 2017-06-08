@@ -57,11 +57,11 @@ This is a Geek-worthy solution that optionally uses recursion and will analyze t
 -  Find Key
 -  Decode
 
-### Analyze [How?](#top-1)
+### Analyze [How](#top-1)
 
 The letters in the `plain.txt` file are read and counted.  Also, the pairs of letters are counted, for example, 'aa', 'ab',...  Usually the most common letter combination in the English language is 'th'.  Anyway, all the frequencies of the occurences of the letters and the pairs are calculated and saved for the next phase ...
 
-### Find Key [How?](#top-1)
+### Find Key [How](#top-1)
 
 The `encrypted.txt` is also analyzed to find its character and pair frequencies.  By sorting the encrypted letter frequencies in the same order as the plain text frequencies, you can get a cipher key that is enough to help you figure out what the text is, but it likely won't be accurate.  It's hard to distinguish between letters that have very similar frequencies.
 
@@ -104,7 +104,7 @@ An example of a language specific scoring function would be to look for 'q', whi
 
 Knowing that sorting by letter frequencies will give an approximation of a correct cipher key, sections of the sorted key are permuted and scored.  The permutation with the highest score wins.
 
-### Decode [How?](#top_1)
+### Decode [How](#top_1)
 Once the cipher key is found, it's just a matter of substituting letter for letter what the text is.
 
 <a id="options"></a>
