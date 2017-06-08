@@ -122,7 +122,6 @@ There is a file modules/initialization that has some 'flags' and variables that 
 | sEncryptedFile | This is the file to decrypt. The default is 'encrypted.txt' |
 | sDecodedFile | This is the file to output the decrypted text to.  The default is  'decoded.txt' |
 
-<id="areas-for-improvement"></id>
 ## Areas for Improvement [top](#top)
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
