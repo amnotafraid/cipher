@@ -68,6 +68,7 @@ The `encrypted.txt` is also analyzed to find its character and pair frequencies.
 Here is a table of the letter frequencies in the English language:
 
 | Letter | Frequency 
+| ------------- | ------------- |
 | E | 12.7 |
 | T | 9.1 |
 | A | 8.2 |
@@ -94,7 +95,6 @@ Here is a table of the letter frequencies in the English language:
 | J | 0.2 |
 | Q | 0.1 |
 | Z | 0.1 |
-| ------------- | ------------- |
 
 The pairs can also be used to figure out if the decryption key is correct.  As already mentioned, 'th' is a popular pair.  So the encrypted key can be used to compare the pair frequencies.
 
