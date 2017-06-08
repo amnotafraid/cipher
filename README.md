@@ -16,7 +16,7 @@
 
 * [Making a Front End](#making-a-frontend)
 
-## Overview
+## Overview [top](#top)
 This is to decode an encrypted file, encrypted.txt, using the language patterns found in the sample file, plain.txt.
 
 To build and run (it is assumed that you have Node installed on your computer):
@@ -27,11 +27,11 @@ npm install
 npm run watch
 ```
 
-## Premise (#top)
+## Premise [top](#top)
 
 Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
 
-## Executing (#top)
+## Executing [top](#top)
 
 To run the program, first get the code and build it as described above.  Next, get your files (encrypted.txt and plain.txt) and put them in the directory with the code.  Then, run the program:
 
@@ -56,11 +56,11 @@ This is a Geek-worthy solution that optionally uses recursion and will analyze t
 * Find Key (#Find Key)
 * Decode (#Decode)
 
-### Analyze (#top-1)
+### Analyze [How?](#top-1)
 
 The letters in the `plain.txt` file are read and counted.  Also, the pairs of letters are counted, for example, 'aa', 'ab',...  Usually the most common letter combination in the English language is 'th'.  Anyway, all the frequencies of the occurences of the letters and the pairs are calculated and saved for the next phase ...
 
-### Find Key (#top-1)
+### Find Key [How?](#top-1)
 
 The `encrypted.txt` is also analyzed to find its character and pair frequencies.  By sorting the encrypted letter frequencies in the same order as the plain text frequencies, you can get a cipher key that is enough to help you figure out what the text is, but it likely won't be accurate.  It's hard to distinguish between letters that have very similar frequencies.
 
@@ -102,10 +102,10 @@ An example of a language specific scoring function would be to look for 'q', whi
 
 Knowing that sorting by letter frequencies will give an approximation of a correct cipher key, sections of the sorted key are permuted and scored.  The permutation with the highest score wins.
 
-### Decode (#top-1)
+### Decode [How?](#top_1)
 Once the cipher key is found, it's just a matter of substituting letter for letter what the text is.
 
-## Options (#top)
+## Options [top](#top)
 There is a file modules/initialization that has some 'flags' and variables that can be modified to change the functioning of the program.  Here's what they do:
 
 | Variable/Flag | Description |
@@ -118,7 +118,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 | sEncryptedFile | This is the file to decrypt. The default is 'encrypted.txt' |
 | sDecodedFile | This is the file to output the decrypted text to.  The default is  'decoded.txt' |
 
-## Areas for Improvement (#top)
+## Areas for Improvement [top](#top)
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
 * Grow up and `Promise`-ize this code.  I was forced to use it in decode when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  But, it should be used consistently.
@@ -127,7 +127,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 * Move the stuff from `modules/decode.js` about finding the cipher key to `modules/findKey.js`. That way it can be more modularized. 
 * *TDD* It's kind of like closing the barn door after the horse got out, but this project really could have benefited from some test driven development.  I spent a whole bunch of time chasing really stupid and obvious bugs.  C'est la vie.  Live and learn.
 
-##Making a Front End (#top)
+##Making a Front End [top](#top)
 I'm currently working in eCommerce.  When you buy products online, there is sort of a multi-step process, right?  You add items to a 'cart', you fill in your shipping information, you choose a shipment option (regular mail, 2nd-day, crazy expensive overnight...), you include payment information.  Behind the scenes there is an object that gets completed with more and more infomation:  products, shipping address, customer information, shipping option, and finally payment.
 
 This project reminded me of that.  There are steps: analyze, find the cipher key, decode.  It occured to me that the user might wish to use the same cipher key on another encrypted file.  Or, they might not want to analyze text again.
