@@ -124,6 +124,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 
 <a id="areas-for-improvement"></a>
 ## Areas for Improvement [top](#top)
+*NOTE*:  I designed it to be run as a command-line program.  To me, the challenge was being able to figure out how to get the correct key.  The endpoints are called in succession by the main file `cipher.js`.
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
 * Grow up and `Promise`-ize this code.  I was forced to use it in decode when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  `Promises` should be used consistently for more reliability--prevent the race conditions, rather than fixing them after they happen.
@@ -146,6 +147,8 @@ I think this project would lend itself to a widget with steps. Each step could f
 2. FindKey - choose an encrypted file to get a key for, *or* choose a previously used cipher key.
 3. Decode - If there wasn't a file chosen in step 2, choose a file, or enter some text to decode
 4. Finish - decoded text is downloaded or displayed as desired.
+
+These steps could each use as endpoints the exported function from the file with the step's name.
 
 The whole thing could benefit from a little MongoDB database on the backend to store some information:
 
