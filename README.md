@@ -94,6 +94,7 @@ Here is a table of the letter frequencies in the English language:
 | J | 0.2 |
 | Q | 0.1 |
 | Z | 0.1 |
+| ------------- | ------------- |
 
 The pairs can also be used to figure out if the decryption key is correct.  As already mentioned, 'th' is a popular pair.  So the encrypted key can be used to compare the pair frequencies.
 
@@ -111,6 +112,7 @@ Once the cipher key is found, it's just a matter of substituting letter for lett
 There is a file modules/initialization that has some 'flags' and variables that can be modified to change the functioning of the program.  Here's what they do:
 
 | Variable/Flag | Description 
+| ------------- | ------------- |
 | bLogConsole | If it's true, output status messages to the console.  This doesn't work right because the programmer (that's me) didn't use the log function consistently. |
 | bAnalyze | If analysis has already been done and the data is available, the analysis phase can be skipped.  The point is a bit moot because I never made a way to save the output of the aanalysis |
 | bDecode | Set this to false if you want to skip the decoding phase.  Why would you do that?  That's no fun. |
