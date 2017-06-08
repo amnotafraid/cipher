@@ -21,6 +21,7 @@ const c           = require('./constants');
  * the first will be an error if there is one
  */
 exports.letterFrequency = (aoLetterSorted, cb) => {
+  console.log('letterFrequency');
   let fMinDiff = 1.0;
   let fTotal = 0.0;
   let fLastFreq = 0.0;

@@ -41,6 +41,9 @@ const terminate   = require('./modules/terminate');
  * node installed and have done npm install.
  */
 
+// TO DO - Grow up! Use promises.:w
+
+
 function step4(err, oConfig) { // JavaScript is upside down
   terminate(err, oConfig);
 }

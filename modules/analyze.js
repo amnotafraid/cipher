@@ -256,6 +256,7 @@ exports.plain = (oConfig, cb) => {
           }
 
           oConfig.aoLetterFrequency = aoLetterFrequency;
+          oConfig.oPairFrequency = oPairFrequency;
           oConfig.aoSortablePairFrequency = aoPairFrequency;
 
           let aoPlainSorted = oConfig.aoLetterFrequency.sort(

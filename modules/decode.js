@@ -25,6 +25,7 @@ const log         = require('./log');
 const terminate   = require('./terminate');
 const test        = require('./test');
 
+const ABCabc = c.abc + c.ABC;
 /*
  * aoScores has objects like this:
  * {
@@ -37,6 +38,7 @@ var aoPlainSorted = [];
 var aoEPF = []; /* aoSortableEncryptedPairFrequency */
 var oEPF = {}; /* tricky - this is a key value where key is encrypted pair
                   and value is frequency */
+var oPPF = {};
 
 /*
  * string replace I copied from a bathroom wall
@@ -55,20 +57,59 @@ var swapArrayElements = function (a, x, y) {
 };
 
 /*
+ * frequency difference:
+ *
+ * if a === b then return 0
+ * else (a - b) / ((a + b) / 2)
+ */
+var diffPercent = function (a, b) {
+	if (a === b) {
+		return 0;
+	}
+	else {
+		if ((a < 0.0001) || (c < 0.0001)) {
+			return 0;
+		}
+		else {
+			return (a - b) / ((a + b) / 2);
+		}
+	}
+}
+
+/*
  * Scoring function have oCode as a parameter
  * and return an integer
  *
  * They have to be declared ABOVE the aScoringFunctions
  * declaration.
  */
+var comparePairs = function (oCode) {
+	let iScore = 0;
+	let pair = 'aa';
+	for (let pair in oPPF) {
+		let pairStr = String(pair);
+		let pairEncrypted = getEncryptedPair(oCode, pairStr[0], pairStr[1]);
+		let a = oPPF[pair];
+		let b = oEPF[pairEncrypted];
+		let x = Math.abs(diffPercent(a, b));
+		if (x < 0.10) {
+			iScore ++;
+		}
+	}
+
+//  console.log(`comparePairs = ${iScore}`);
+  return iScore;
+}
+
 var aNeverPairs = [];
 var neverPairs = function (oCode) {
   let iScore = 0;
   aNeverPairs.forEach(function(pair) {
-    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
+		let pairStr = String(pair);
+		let pairEncrypted = getEncryptedPair(oCode, pairStr[0], pairStr[1]);
     let frequency = oEPF[pairEncrypted];
-    if (frequency === 0) {
-      iScore++;
+    if (frequency > 0.00001) {
+      iScore--;
     }
   });
 
@@ -80,10 +121,14 @@ var aVeryCommonPairs = [];
 var veryCommonPairs = function (oCode) {
   let iScore = 0;
   aVeryCommonPairs.forEach(function(pair) {
-    let pairEncrypted = getEncryptedPair(oCode, pair[0], pair[1]);
+		let pairStr = String(pair);
+		let pairEncrypted = getEncryptedPair(oCode, pairStr[0], pairStr[1]);
+		let a = oPPF[pair];
+		let b = oEPF[pairEncrypted];
+//		console.log(`${pairEncrypted} frequency is ${a} => ${pair} = is ${b}`);
     let frequency = oEPF[pairEncrypted];
     if (frequency > 0.02) {
-      iScore+=2;
+      iScore+=10;
     }
   });
 
@@ -196,7 +241,15 @@ function getEncryptedPair(oCode, a, b) {
 }
 
 //var aScoringFunctions = [neverPairs,veryCommonPairs,commonPairs,likelyPairs,rarePairs,ae,th,q];
-var aScoringFunctions = [veryCommonPairs,ae,th,q];
+//var aScoringFunctions = [veryCommonPairs,ae,th,q];
+/*--- IMPORTANT:  Below is a list of the scoring functions that will be used ---*/
+var aScoringFunctions = [
+				veryCommonPairs,
+				neverPairs,
+				ae,
+				th,
+				comparePairs,
+			];
 
 /*
  * makePairProbability
@@ -214,16 +267,13 @@ var aScoringFunctions = [veryCommonPairs,ae,th,q];
  * an array of arrays and then the scoring functions should
  * be parameterized...
  *
- * Sorry.  I have to go to work tomorrow.  You know?  The
- * job that pays me?
- *
- * As fun as coding challenges are, they don't pay the bills.
  */
 function makePairProbability(oConfig) {
 //  console.log('aoEPF = ' + JSON.stringify(oConfig.aoSortablePairFrequency, null, 2));
   let aoPPF = R.clone(oConfig.aoSortablePairFrequency);
   let aoPPFReduce = [];
 
+	/* Find the never pairs */
   for (let i = 0; i < aoPPF.length; i++) {
     if (aoPPF[i].frequency === 0) {
       aNeverPairs.push(aoPPF[i].pair);
@@ -235,8 +285,10 @@ function makePairProbability(oConfig) {
 
   aoPPF = R.difference(aoPPF, aoPPFReduce);
   aoPPFReduce.splice(0,aoPPFReduce.length);
+
+	/* Find the common pairs */
   for (let i = 0; i < aoPPF.length; i++) {
-    if (parseFloat(aoPPF[i].frequency) > parseFloat(0.02)) {
+    if (aoPPF[i].frequency > 0.02) {
       aVeryCommonPairs.push(aoPPF[i].pair);
       aoPPFReduce.push(aoPPF[i]);
     }
@@ -313,7 +365,6 @@ function addCodeUpperCase(oCode) {
  * Make an oCode, score it, and save it
  */
 function scoreAndSave(a) {
-//	console.log('a = ' + JSON.stringify(a, null, 2));
   var obj = {};
   let oCode = getCode(a, aoPlainSorted);
   obj.iScore = score(oCode);
@@ -322,9 +373,7 @@ function scoreAndSave(a) {
   let sCipher = getCipher(oCode);
   let s = getString(a);
   console.log(`string ${s} score = ${obj.iScore}`);
-//  console.log('iScore = ' + obj.iScore);
   aoScores.push(obj);
-//  console.log('# of arrays = ' + aoScores.length);
 }
 
 function getString(a) {
@@ -341,7 +390,6 @@ function permuteAndScoreSection(a, beg, end) {
   }
   let s = getString(a);
   scoreAndSave(a);
-//  console.log(`${s} ${beg} ${end}`);
 
   for (let j = beg; j <= end; j++) {
     permuteAndScoreSection(
@@ -357,38 +405,55 @@ function getArrayWithBestScore() {
     }
   );
 
+//	console.log(`bestScore = ${aoScoresSorted[0].iScore}`);
   let aoES = R.clone(aoScoresSorted[0].aoES);
+	if (aoScoresSorted[0].iScores === aoScoresSorted[1].iScores) {
+		console.log('WARNING - alternate permutations have same score, so it will not be possible to know what the accurate sCipher is.  What you can do is add more scoring functions. Please see  aScoringFunctions in modules/decode.js');
+	}
   aoScores.splice(0,aoScores.length);
-  console.log(aoScores);
   return aoES;
 }
 
 /*
  * aoES means aoEncryptedSorted
+ * 
+ * This will call back when it's done.  The callback signature is
+ *
+ *     cb (err, oConfig, oCode);
  */
-function permuteAndScore(aoES) {
-  let s = getString(aoES);
-  
 
-//  console.log(`before: ${s}`);
-  let lenSection = 5;
-  let last = c.alphabetLength - lenSection;
+// To do -- What no errors handling?  Really?
+// you need to do error checking
+function permuteAndScore(aoES, oConfig, cb) {
+	return new Promise((resolve, reject) => {
+		if (!oConfig.bInDepthDecode) {
+			let oCode = getCode(aoES, aoPlainSorted);
+			oCode = addCodeUpperCase(oCode);
+			oConfig.oCode = oCode;
+			let iScore = score(oCode);
+			console.log(`score = ${iScore}`);
+			resolve (oConfig);
+		}
+		else {
+			makePairProbability(oConfig);
+			/*--- IMPORTANT - If it doesn't decrypt, change
+         the lenSection to be larger --*/
+			let lenSection = 7;
+			let last = c.alphabetLength - lenSection;
 
-  for (let i = 0; i < last; i++) {
-    permuteAndScoreSection (aoES, i, i + lenSection)
-    aoES = getArrayWithBestScore();
-  }
+			for (let i = 0; i < last; i++) {
+				permuteAndScoreSection (aoES, i, i + lenSection)
+				aoES = getArrayWithBestScore();
+			}
 
-  s = getString(aoES);
-  console.log(`after: ${s}`);
-
-  let oCode = getCode(aoES, aoPlainSorted);
-
-  let iScore = score(oCode);
-  console.log('iScore = ' + iScore);
-  console.log('oCode = ' + JSON.stringify(oCode, null, 2));
-
-  return addCodeUpperCase(oCode);
+			let oCode = getCode(aoES, aoPlainSorted);
+			oCode = addCodeUpperCase(oCode);
+			oConfig.oCode = oCode;
+			let iScore = score(oCode);
+			console.log(`score = ${iScore}`);
+			resolve (oConfig);
+		}
+	});//end Promise
 }
 
 /*
@@ -402,7 +467,7 @@ function permuteAndScore(aoES) {
  * It will sort both of these in order of the frequency.  The idea is
  * that will reveal the cipher.
  *
- * If it works, it will build oCode that will look like this:
+ * If it will build oCode that will look like this:
  *
  *    {
  *      a: z,
@@ -420,73 +485,71 @@ function permuteAndScore(aoES) {
  * is a lower case string. If it were a reverse encrypt, it would be
  * the alphabet in reverse.
  *
- * The callback looks like this:
+ * This returns a Promise. Data if all is well:
  *
- *    cb (err, oCode, sCipher, oConfig)
+ *		oConfig.oCode
+ *		oConfig.sCipher 
+ *
  */
-function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
-  if (!Array.isArray(oConfig.aoLetterFrequency)) {
-    cb('Original (plain text) letter frequency analysis is missing',
-       null, null, oConfig);
-  }
-  if (!Array.isArray(aoLetterFrequency)) {
-    cb('Encrypted letter frequency analysis is missing',
-       null, null, oConfig);
-  }
+function getLetterCipherKey(aoLetterFrequency, oConfig) {
+	return new Promise((resolve, reject) => {
+		if (!Array.isArray(oConfig.aoLetterFrequency)) {
+			reject('Original (plain text) letter frequency analysis is missing');
+		}
+		if (!Array.isArray(aoLetterFrequency)) {
+			reject('Encrypted letter frequency analysis is missing');
+		}
 
-  /*
-   * obj2 - obj1 - sort descending biggest first
-   * obj2 - obj2 - sort ascending
-   */
+		/*
+		 * obj2 - obj1 - sort descending biggest first
+		 * obj2 - obj2 - sort ascending
+		 */
 
-  /*
-   * aoPlainSorted is a global variable.  It will never
-   * change.  It is the letters sorted by frequency.
-   *
-   * Meanwhile, aoEncryptedSorted is a local variable.
-   * Arrays are immutable, which means that if you want
-   * to sort it, you have to make a new one.  Many new
-   * ones will be made as the letters are permuted and
-   * the sort is scored to find the best one.
-   *
-   */
-  aoPlainSorted = oConfig.aoLetterFrequency.sort(
-    function(obj1, obj2) {
-      return obj2.frequency - obj1.frequency;
-    }
-  );
+		/*
+		 * aoPlainSorted is a global variable.  It will never
+		 * change.  It is the letters sorted by frequency.
+		 *
+		 * Meanwhile, aoEncryptedSorted is a local variable.
+		 * Arrays are immutable, which means that if you want
+		 * to sort it, you have to make a new one.  Many new
+		 * ones will be made as the letters are permuted and
+		 * the sort is scored to find the best one.
+		 *
+		 */
+		aoPlainSorted = oConfig.aoLetterFrequency.sort(
+			function(obj1, obj2) {
+				return obj2.frequency - obj1.frequency;
+			}
+		);
 
-  let aoEncryptedSorted = [];
-  aoEncryptedSorted = aoLetterFrequency.sort(
-    function(obj1, obj2) {
-      return obj2.frequency - obj1.frequency;
-    }
-  );
+		let aoEncryptedSorted = [];
+		aoEncryptedSorted = aoLetterFrequency.sort(
+			function(obj1, obj2) {
+				return obj2.frequency - obj1.frequency;
+			}
+		);
 
-  if (aoPlainSorted.length !== 26 || 
-      aoEncryptedSorted.length !== 26) {
-    cb('The two letter frequency arrays lengths is wrong.  They should both be 26', null, null, oConfig);
-  }
+		if (aoPlainSorted.length !== c.abc.length || 
+				aoEncryptedSorted.length !== c.abc.length) {
+			reject(`The two letter frequency arrays lengths is wrong.  They should both be ${c.abc}`);
+		}
 
-  test.letterFrequency(aoEncryptedSorted, function (err, fMinDiff) {
-    if (err) {
-      cb(err, null, null, oConfig);
-    }
-    log(`fMinDiff for ${oConfig.sEncryptedFilePath} is ${fMinDiff}.  This is the minimum difference between the frequencies`, oConfig);
+		test.letterFrequency(aoEncryptedSorted, function (err, fMinDiff) {
+			if (err) {
+				reject(err);
+			}
 
-    /* analyze the plain pairs to find which pairs
-     * are common
-     */
-    makePairProbability(oConfig);
-
-    let oCode = permuteAndScore(aoEncryptedSorted); 
-
-    let sCipher = getCipher(oCode);
-
-    oCode = addCodeUpperCase(oCode);
-
-    cb (null, oCode, sCipher, oConfig);
-  });
+			permuteAndScore(aoEncryptedSorted, oConfig)
+				.then (oConfig => {
+					let sCipher = getCipher(oConfig.oCode);
+					oConfig.sCipher = sCipher;
+					resolve(oConfig);
+				},
+				function (error) {
+					cb(error);
+				});// end permuteAndScore
+			});// end test.letter...
+	});//end promise
 }
 
 
@@ -517,56 +580,69 @@ function getLetterCipherKey(aoLetterFrequency, oConfig, cb) {
 
 module.exports = function(oConfig, cb) {
   log('decode', oConfig);
-//  console.log('oConfig.aoSortablePairFrequency = ' + JSON.stringify(oConfig.aoSortablePairFrequency, null, 2));
   if (oConfig.bDecode) {
     // get encrypted file's letter and pair frequencies
     analyze.encrypted(oConfig,
       function (err, aoEncryptedLetterFrequency, oEncryptedPairFrequency, aoSortableEncryptedPairFrequency, oConfig) {
         log('return from analyze.encrypted', oConfig);
         aoEPF = aoSortableEncryptedPairFrequency;
-        console.log('oEncryptedPairFrequency = ' + JSON.stringify(oEncryptedPairFrequency, null, 2));
         oEPF = oEncryptedPairFrequency;
+				oPPF = oConfig.oPairFrequency;
         // use letter frequencies to make a cipher
-        getLetterCipherKey(aoEncryptedLetterFrequency, oConfig,
-          function (err, oCode, sCipher, oConfig) {
-            if (err) {
-              // getPairCipherKey goes here
-              cb (err, oConfig);
-            }
+        getLetterCipherKey(aoEncryptedLetterFrequency, oConfig) 
+					.then(function(oConfig)  {
+						let oCode = oConfig.oCode;
 
-            log(`sCipher = ${sCipher}`, oConfig);
+						let outputFile = '';
+						if (oConfig.bOutputConsole) {
+							outputFile = process.stdout;
+						}
+					  else {
+							outputFile = fs.createWriteStream(oConfig.sDecodedFilePath);
+						}
+						fs.createReadStream(oConfig.sEncryptedFilePath, {
+							encoding: 'utf8'
+						})
+						.on('error', function(err) {
+							cb(err, oConfig)
+						})
+						.pipe(through2((data, enc, cb) => {
+							let str = data.toString();
+							let str2 = '';
 
-            let outputFile = fs.createWriteStream(oConfig.sDecodedFilePath);
-            fs.createReadStream(oConfig.sEncryptedFilePath, {
-              encoding: 'utf8'
-            })
-            .on('error', function(err) {
-              cb(err, oConfig)
-            })
-            .pipe(through2((data, enc, cb) => {
-              let str = data.toString();
-
-              for (let key of Object.keys(oCode)) {
-                str = str.replaceAll(key, oCode[key]);
-              }
-              
-              cb(null, new Buffer(str));
-              })
-            )
-            .on('error', function(err) {
-              cb(err, oConfig)
-            })
-            .pipe(outputFile)
-            .on('error', function(err) {
-              cb(err, oConfig);
-            })
-            .on('finish', function () {
-              console.log('\nfinish');
-              cb (null, oConfig);
-            });
-          }); //getLetterCipherKey
-      });
+							for (let i = 0; i < str.length; i++) {
+								if (ABCabc.indexOf(str[i]) === -1) {
+									str2 += str[i];
+								}
+								else {
+									str2 += oCode[str[i]];
+								}
+							}
+							
+							cb(null, new Buffer(str2));
+							})
+						)
+						.on('error', function(err) {
+							cb(err, oConfig)
+						})
+						.pipe(outputFile)
+						.on('error', function(err) {
+							cb(err, oConfig);
+						})
+						.on('finish', function () {
+							console.log('\nfinish');
+							if (!oConfig.bOutputConsole) {
+								console.log(`output file is ${oConfig.sDecodedFilePath}`);
+							}
+						  console.log(`sCipher = ${oConfig.sCipher}`);
+							cb (null, oConfig);
+						});
+					}) // then
+					.catch (function(err) {
+						console.log(err);
+						cb(err, oConfig);
+					});
+		});
   }
-
   cb(null, oConfig);
 }

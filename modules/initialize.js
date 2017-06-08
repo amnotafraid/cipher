@@ -5,13 +5,15 @@ const now         = require('performance-now');
 
 const log         = require('./log');
 
+// TO DO - add command line parser to set these parameters:
+
 module.exports = (cb) => {
   var oConfig = {
     bLogConsole: true,
-    bAnalyze: false,
-    bDecode: false,
-    sInputFile: '../input.json',
-    sOutputFile: '../output.json',
+    bAnalyze: true,
+    bDecode: true,
+    bInDepthDecode: true,
+    bOutputConsole: false,
     tStart: now(),
   };
 
