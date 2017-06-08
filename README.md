@@ -29,7 +29,7 @@ npm run watch
 <a id="premise"></a>
 ## Premise [top](#top)
 
-Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
+Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) file named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
 
 <a id="executing"></a>
 ## How to run [top](#top)
