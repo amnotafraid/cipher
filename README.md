@@ -104,7 +104,7 @@ An example of a language specific scoring function would be to look for 'q', whi
 
 Knowing that sorting by letter frequencies will give an approximation of a correct cipher key, sections of the sorted key are permuted and scored.  The permutation with the highest score wins.
 
-### Decode [How](#top_1)
+### Decode [How](#top-1)
 Once the cipher key is found, it's just a matter of substituting letter for letter what the text is.
 
 <a id="options"></a>
