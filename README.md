@@ -57,7 +57,6 @@ This is a Geek-worthy solution that optionally uses recursion and will analyze t
 * Find Key (#Find Key)
 * Decode (#Decode)
 
-<a id="executing"></a>
 ### Analyze [How?](#top-1)
 
 The letters in the `plain.txt` file are read and counted.  Also, the pairs of letters are counted, for example, 'aa', 'ab',...  Usually the most common letter combination in the English language is 'th'.  Anyway, all the frequencies of the occurences of the letters and the pairs are calculated and saved for the next phase ...
