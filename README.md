@@ -1,14 +1,13 @@
 <a id="top"></a>
-
 # Cipher
 
 * [Overview](#overview)
 
-* [Introduction](#premise)
+* [Premise](#premise)
 
-* [Executing](#executing)
+* [How to run](#executing)
 
-* [How does this work?](#how-does-this-work)
+* [How does this work?](#top-1)
 
 * [Options](#options)
 
@@ -16,6 +15,7 @@
 
 * [Making a Front End](#making-a-frontend)
 
+<a id="overview"></a>
 ## Overview [top](#top)
 This is to decode an encrypted file, encrypted.txt, using the language patterns found in the sample file, plain.txt.
 
@@ -26,11 +26,12 @@ git clone ...
 npm install
 npm run watch
 ```
-
+<a id="premise"></a>
 ## Premise [top](#top)
 
 Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
 
+<a id="executing"></a>
 ## Executing [top](#top)
 
 To run the program, first get the code and build it as described above.  Next, get your files (encrypted.txt and plain.txt) and put them in the directory with the code.  Then, run the program:
@@ -49,13 +50,14 @@ npm run watch
 Nodemon will watch for any changes in the \*.js files and start the program over if it sees one.
 
 <a id="top-1"></a>
-## How does this work? (#top)
+## How does this work? [top](#top)
 This is a Geek-worthy solution that optionally uses recursion and will analyze the file to correctness. Using the following steps:
 
 * Analyze (#Analyze)
 * Find Key (#Find Key)
 * Decode (#Decode)
 
+<a id="executing"></a>
 ### Analyze [How?](#top-1)
 
 The letters in the `plain.txt` file are read and counted.  Also, the pairs of letters are counted, for example, 'aa', 'ab',...  Usually the most common letter combination in the English language is 'th'.  Anyway, all the frequencies of the occurences of the letters and the pairs are calculated and saved for the next phase ...
@@ -105,6 +107,7 @@ Knowing that sorting by letter frequencies will give an approximation of a corre
 ### Decode [How?](#top_1)
 Once the cipher key is found, it's just a matter of substituting letter for letter what the text is.
 
+<a id="options"></a>
 ## Options [top](#top)
 There is a file modules/initialization that has some 'flags' and variables that can be modified to change the functioning of the program.  Here's what they do:
 
@@ -118,6 +121,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 | sEncryptedFile | This is the file to decrypt. The default is 'encrypted.txt' |
 | sDecodedFile | This is the file to output the decrypted text to.  The default is  'decoded.txt' |
 
+<id="areas-for-improvement"></id>
 ## Areas for Improvement [top](#top)
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
@@ -127,6 +131,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 * Move the stuff from `modules/decode.js` about finding the cipher key to `modules/findKey.js`. That way it can be more modularized. 
 * *TDD* It's kind of like closing the barn door after the horse got out, but this project really could have benefited from some test driven development.  I spent a whole bunch of time chasing really stupid and obvious bugs.  C'est la vie.  Live and learn.
 
+<id="making-a-frontend"></a>
 ##Making a Front End [top](#top)
 I'm currently working in eCommerce.  When you buy products online, there is sort of a multi-step process, right?  You add items to a 'cart', you fill in your shipping information, you choose a shipment option (regular mail, 2nd-day, crazy expensive overnight...), you include payment information.  Behind the scenes there is an object that gets completed with more and more infomation:  products, shipping address, customer information, shipping option, and finally payment.
 
