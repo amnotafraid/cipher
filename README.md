@@ -53,9 +53,9 @@ Nodemon will watch for any changes in the \*.js files and start the program over
 ## How does this work? [top](#top)
 This is a Geek-worthy solution that optionally uses recursion and will analyze the file to correctness. It uses the following steps:
 
-* Analyze (#Analyze)
-* Find Key (#Find Key)
-* Decode (#Decode)
+* [Analyze](#Analyze)
+* [Find Key](#Find Key)
+* [Decode](#Decode)
 
 ### Analyze [How?](#top-1)
 
