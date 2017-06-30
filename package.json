@@ -1,0 +1,35 @@
+{
+  "name": "cipher",
+  "version": "0.9.1",
+  "description": "Using analysis of English language text find one-to-one cipher for encrypted text",
+  "main": "ciper.js",
+  "scripts": {
+    "test": "tba",
+    "watch": "nodemon --harmony cipher.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amnotafraid/cipher.git"
+  },
+  "keywords": [
+    "cipher",
+    "decrypt",
+    "codebreaking",
+    "JavaScript",
+    "ES2015",
+    "cryptography",
+    "letter",
+    "substitution"
+  ],
+  "author": "Bessie Malek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amnotafraid/cipher/issues"
+  },
+  "homepage": "https://github.com/amnotafraid/cipher#readme",
+  "dependencies": {
+    "performance-now": "^2.1.0",
+    "ramda": "^0.24.1",
+    "through2": "^2.0.3"
+  }
+}

@@ -6,9 +6,6 @@ npm-debug.log*
 # txt
 *.txt
 
-# json
-*.json
-
 # pdf
 *.pdf
 
