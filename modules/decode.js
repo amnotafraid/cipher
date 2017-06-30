@@ -438,7 +438,7 @@ function permuteAndScore(aoES, oConfig, cb) {
 			makePairProbability(oConfig);
 			/*--- IMPORTANT - If it doesn't decrypt, change
          the lenSection to be larger --*/
-			let lenSection = 7;
+			let lenSection = 5;
 			let last = c.alphabetLength - lenSection;
 
 			for (let i = 0; i < last; i++) {

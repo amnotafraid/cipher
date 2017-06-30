@@ -1,14 +1,13 @@
 <a id="top"></a>
-
 # Cipher
 
 * [Overview](#overview)
 
-* [Introduction](#premise)
+* [Premise](#premise)
 
-* [Executing](#executing)
+* [How to run](#executing)
 
-* [How does this work?](#how-does-this-work)
+* [How does this work?](#top-1)
 
 * [Options](#options)
 
@@ -16,7 +15,8 @@
 
 * [Making a Front End](#making-a-frontend)
 
-## Overview
+<a id="overview"></a>
+## Overview [top](#top)
 This is to decode an encrypted file, encrypted.txt, using the language patterns found in the sample file, plain.txt.
 
 To build and run (it is assumed that you have Node installed on your computer):
@@ -26,12 +26,13 @@ git clone ...
 npm install
 npm run watch
 ```
+<a id="premise"></a>
+## Premise [top](#top)
 
-## Premise (#top)
+Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) file named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
 
-Given a sample file named `plain.txt` that contains a (large) sample of a Roman-based language[*](#note-1) and an encrypted[**](#note-2) named `encrypted.txt`, this command line program will figure out the cipher key and decrypt the file.
-
-## Executing (#top)
+<a id="executing"></a>
+## How to run [top](#top)
 
 To run the program, first get the code and build it as described above.  Next, get your files (encrypted.txt and plain.txt) and put them in the directory with the code.  Then, run the program:
 
@@ -49,24 +50,25 @@ npm run watch
 Nodemon will watch for any changes in the \*.js files and start the program over if it sees one.
 
 <a id="top-1"></a>
-## How does this work? (#top)
-This is a Geek-worthy solution that optionally uses recursion and will analyze the file to correctness. Using the following steps:
+## How does this work? [top](#top)
+This is a Geek-worthy solution that optionally uses recursion and will analyze the file to correctness. It uses the following steps:
 
-* Analyze (#Analyze)
-* Find Key (#Find Key)
-* Decode (#Decode)
+-  Analyze
+-  Find Key
+-  Decode
 
-### Analyze (#top-1)
+### Analyze [How](#top-1)
 
 The letters in the `plain.txt` file are read and counted.  Also, the pairs of letters are counted, for example, 'aa', 'ab',...  Usually the most common letter combination in the English language is 'th'.  Anyway, all the frequencies of the occurences of the letters and the pairs are calculated and saved for the next phase ...
 
-### Find Key (#top-1)
+### Find Key [How](#top-1)
 
 The `encrypted.txt` is also analyzed to find its character and pair frequencies.  By sorting the encrypted letter frequencies in the same order as the plain text frequencies, you can get a cipher key that is enough to help you figure out what the text is, but it likely won't be accurate.  It's hard to distinguish between letters that have very similar frequencies.
 
 Here is a table of the letter frequencies in the English language:
 
-| Letter | Frequency |
+| Letter | Frequency 
+| ------------- | ------------- |
 | E | 12.7 |
 | T | 9.1 |
 | A | 8.2 |
@@ -102,32 +104,37 @@ An example of a language specific scoring function would be to look for 'q', whi
 
 Knowing that sorting by letter frequencies will give an approximation of a correct cipher key, sections of the sorted key are permuted and scored.  The permutation with the highest score wins.
 
-### Decode (#top-1)
+### Decode [How](#top-1)
 Once the cipher key is found, it's just a matter of substituting letter for letter what the text is.
 
-## Options (#top)
+<a id="options"></a>
+## Options [top](#top)
 There is a file modules/initialization that has some 'flags' and variables that can be modified to change the functioning of the program.  Here's what they do:
 
-| Variable/Flag | Description |
+| Variable/Flag | Description 
+| ------------- | ------------- |
 | bLogConsole | If it's true, output status messages to the console.  This doesn't work right because the programmer (that's me) didn't use the log function consistently. |
 | bAnalyze | If analysis has already been done and the data is available, the analysis phase can be skipped.  The point is a bit moot because I never made a way to save the output of the aanalysis |
 | bDecode | Set this to false if you want to skip the decoding phase.  Why would you do that?  That's no fun. |
 | bInDepthDecode | Set this to true if you want to do the permutations and scoring to get a better cipher code |
 | bOutputConsole | Set this to true if you want to output the decoded text to the console rather than to a file |
-| sAnalyzeFile | This is the file to analyze.  The default is 'plain.txt' |
-| sEncryptedFile | This is the file to decrypt. The default is 'encrypted.txt' |
-| sDecodedFile | This is the file to output the decrypted text to.  The default is  'decoded.txt' |
+| sAnalyzeFile | This is the file to analyze.  The default is `plain.txt` |
+| sEncryptedFile | This is the file to decrypt. The default is `encrypted.txt` |
+| sDecodedFile | This is the file to output the decrypted text to.  The default is  `decoded.txt` |
 
-## Areas for Improvement (#top)
+<a id="areas-for-improvement"></a>
+## Areas for Improvement [top](#top)
+*NOTE*:  I designed it to be run as a command-line program.  To me, the challenge was being able to figure out how to get the correct key.  The endpoints are called in succession by the main file `cipher.js`.
 * Add command line parameters that can control all the options
 * Tighten up the logging to console so that bLogConsole actually controls that
-* Grow up and `Promise`-ize this code.  I was forced to use it in decode when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  But, it should be used consistently.
-* Tighten up what version of JavaScript standard is adhered to.  I started out with good intentions to us ES2015, but as I got more involved, I fell into old habits.
+* Grow up and `Promise`-ize this code.  I was forced to use it in `modules/decode` when I get the cipher key.  The thing would return before it had the cipher key and the replacement stream would error out.  `Promises` should be used consistently for more reliability--prevent the race conditions, rather than fixing them after they happen.
+* Tighten up what version of JavaScript standard is adhered to.  I started out with good intentions to use ES2015, but as I got more involved, I fell into old habits.
 * Try it on a different language.  Will it work?  I think it will.  *Oh, hey* a *language* option could be added to choose a specific language.  There could be different scoring functions for different languages.
 * Move the stuff from `modules/decode.js` about finding the cipher key to `modules/findKey.js`. That way it can be more modularized. 
 * *TDD* It's kind of like closing the barn door after the horse got out, but this project really could have benefited from some test driven development.  I spent a whole bunch of time chasing really stupid and obvious bugs.  C'est la vie.  Live and learn.
 
-##Making a Front End (#top)
+<a id="making-a-frontend"></a>
+## Making a Front End [top](#top)
 I'm currently working in eCommerce.  When you buy products online, there is sort of a multi-step process, right?  You add items to a 'cart', you fill in your shipping information, you choose a shipment option (regular mail, 2nd-day, crazy expensive overnight...), you include payment information.  Behind the scenes there is an object that gets completed with more and more infomation:  products, shipping address, customer information, shipping option, and finally payment.
 
 This project reminded me of that.  There are steps: analyze, find the cipher key, decode.  It occured to me that the user might wish to use the same cipher key on another encrypted file.  Or, they might not want to analyze text again.
@@ -140,6 +147,8 @@ I think this project would lend itself to a widget with steps. Each step could f
 2. FindKey - choose an encrypted file to get a key for, *or* choose a previously used cipher key.
 3. Decode - If there wasn't a file chosen in step 2, choose a file, or enter some text to decode
 4. Finish - decoded text is downloaded or displayed as desired.
+
+These steps could each use as endpoints the exported function from the file with the step's name.
 
 The whole thing could benefit from a little MongoDB database on the backend to store some information:
 
