@@ -67,7 +67,7 @@ The `encrypted.txt` is also analyzed to find its character and pair frequencies.
 
 Here is a table of the letter frequencies in the English language:
 
-| Letter | Frequency 
+| Letter | Frequency (%)
 | ------------- | ------------- |
 | E | 12.7 |
 | T | 9.1 |
