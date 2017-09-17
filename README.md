@@ -114,7 +114,7 @@ There is a file modules/initialization that has some 'flags' and variables that 
 | Variable/Flag | Description 
 | ------------- | ------------- |
 | bLogConsole | If it's true, output status messages to the console.  This doesn't work right because the programmer (that's me) didn't use the log function consistently. |
-| bAnalyze | If analysis has already been done and the data is available, the analysis phase can be skipped.  The point is a bit moot because I never made a way to save the output of the aanalysis |
+| bAnalyze | If analysis has already been done and the data is available, the analysis phase can be skipped.  The point is a bit moot because I never made a way to save the output of the analysis |
 | bDecode | Set this to false if you want to skip the decoding phase.  Why would you do that?  That's no fun. |
 | bInDepthDecode | Set this to true if you want to do the permutations and scoring to get a better cipher code |
 | bOutputConsole | Set this to true if you want to output the decoded text to the console rather than to a file |
